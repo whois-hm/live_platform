@@ -1,0 +1,11 @@
+#example
+#split f mean that source file
+#split p mean that proxy rtsp
+#split d mean that device camera
+#f^path
+#p^url
+#d^path
+#-----------------add streams-----------------
+
+
+#---------------------------------------------
