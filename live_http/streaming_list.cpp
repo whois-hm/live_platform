@@ -2,49 +2,43 @@
 
 streaming_list::streaming_list() : _contentsindex(0)
 {
-	/*
-		 first find local device
-	 */
-	for(Poco::DirectoryIterator it(std::string("/dev"));
-			it != Poco::DirectoryIterator();
-			++it)
+	std::ifstream f;
+	f.open("streamlist.txt");
+	if(!f.is_open())
 	{
-		if(contain_string(it.name().c_str(), "video"))
+		return;
+	}
+	while(!f.eof())
+	{
+		int type = -1;
+
+		char arr[256] = {0, };
+		f.getline(arr, 256);
+		std::string source(arr);
+		std::vector <std::string> list;
+		std::stringstream ss(source);
+		char splitvalue = '^';
+		std::string token;
+		while(std::getline(ss, token, splitvalue))
 		{
-			add(source_type_uvc,
-					(*it).path(),
-					it.name());
+			list.push_back(token);
+		}
+		if(list.size() == 3)
+		{
+			if(list[0] == "f")  	type = (int)source_type_file;
+			else if(list[0] == "d") type = (int)source_type_uvc;
+			else if(list[0] == "p")	type = (int)source_type_rtspclient;
+
+			if(type != -1)
+			{
+				add((enum source_type) type,
+					list[1],
+					list[2]);
+			}
 		}
 	}
-	/*
-		 next find mp4
-	 */
-	for(Poco::DirectoryIterator it(Poco::Path::current());
-			it != Poco::DirectoryIterator();
-			++it)
-	{
-		if(contain_string(it.name().c_str(), ".mp4"))
-		{
-			add(source_type_file,
-					(*it).path(),
-					it.name());
-		}
-	}
-	/*
-		 next proxy
-	 */
-	char const *proxys[] =
-	{
-			"rtsp://184.72.239.149/vod/mp4:BigBuckBunny_175k.mov"
-	};
-	for(int i = 0;
-			i < ((int)sizeof(proxys) / (int)sizeof(proxys[0]));
-			i++)
-	{
-		add(source_type_rtspclient,
-				proxys[i],
-				proxys[i]);
-	}
+	f.close();
+	
 }
 const std::list<streaming_list::stream_values> &streaming_list::get() {
 	return _list;

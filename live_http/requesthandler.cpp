@@ -428,7 +428,7 @@ void play_requesthandler::start_server_process()
 	for(auto &it : param._sessionparameters_pairs)
 	{
 		char linebuffer[512] = {0, };
-		snprintf(linebuffer, 500, "./lmp -o server -t %s -s '%s' -i '%s' -p %d -u %s -w %s &",
+		snprintf(linebuffer, 500, "./live_unit_rtspserver -o server -t %s -s '%s' -i '%s' -p %d -u %s -w %s &",
 				session_in_par(it)._type == source_type_uvc ? "uvc" : session_in_par(it)._type == source_type_file ? "file" : "proxy",
 				session_in_par(it)._session_name.c_str(),
 				session_in_par(it)._target.c_str(),
@@ -436,7 +436,6 @@ void play_requesthandler::start_server_process()
 				get_auth_id().c_str(),
 				get_auth_pwd().c_str());
 
-		printf("linebuffer = %s\n", linebuffer);
 		system(linebuffer);
 	}
 
