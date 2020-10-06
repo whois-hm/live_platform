@@ -2,6 +2,7 @@
 
 streaming_list::streaming_list() : _contentsindex(0)
 {
+
 	std::ifstream f;
 	f.open("streamlist.txt");
 	if(!f.is_open())
@@ -31,15 +32,45 @@ streaming_list::streaming_list() : _contentsindex(0)
 
 			if(type != -1)
 			{
-				add((enum source_type) type,
-					list[1],
-					list[2]);
+				if(exist((enum source_type) type,
+						list[1],
+						list[2]))
+				{
+					add((enum source_type) type,
+						list[1],
+						list[2]);
+				}
 			}
 		}
 	}
 	f.close();
 	
 }
+bool streaming_list::exist(enum source_type stype, 
+	const std::string &path,
+	const std::string &name)
+{
+	bool res = false;
+	lm_liveserver_log(dlog::normal,"cheking source can be streamming... %s\n", path.c_str());
+	if(stype == source_type_file)
+	{
+		Poco::File f(path);
+		res = f.exists();
+	}
+	if(stype == source_type_uvc)
+	{
+		Poco::File f(path);
+		res = f.exists();
+	}
+	if(stype == source_type_rtspclient)
+	{
+		res = !live5rtspclient::targetserver_alive(3000, path, "", "").empty();
+	}
+	if(res) lm_liveserver_log(dlog::normal,"cheking source can be streamming... %s... ok!\n", path.c_str());
+	else lm_liveserver_log(dlog::normal,"cheking source can be streamming... %s... fail!\n", path.c_str());
+	return res;
+}
+
 const std::list<streaming_list::stream_values> &streaming_list::get() {
 	return _list;
 }
@@ -53,3 +84,4 @@ void streaming_list::add(enum source_type t,
 			n,
 			std::string(contents + Poco::NumberFormatter::format(_contentsindex++))));
 }
+

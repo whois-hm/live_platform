@@ -14,6 +14,12 @@ class streaming_list
 	 	 our main contents index
 	 */
 	unsigned _contentsindex;
+	/*
+		open test
+	*/
+	bool exist(enum source_type stype, 
+	const std::string &path,
+	const std::string &name);
 public:
 	typedef std::tuple<enum source_type, /*source type*/
 			std::string,/*full path*/

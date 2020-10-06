@@ -143,63 +143,14 @@ void information_requesthandler::handle_message_file(Poco::Net::HTTPServerReques
 
 void information_requesthandler::handle_message_proxy(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {
+	std::string sdp;
 	if(std::get<streaming_list::index::type>(_target) != source_type_rtspclient)
 	{
 		return;
 	}
 
-	class rtsp_sdp_client :public live5rtspclient
-	{
-		std::string *_sdp;
-		semaphore *_sem;
-	public:
-		rtsp_sdp_client (UsageEnvironment& env,
-						 const report &notify,
-						 char const* rtspurl,
-							 std::string *sdp,
-							 semaphore *sem,
-						 char const *authid = nullptr,
-						 char const *authpwd = nullptr):
-			live5rtspclient(env,
-							notify,
-							rtspurl,
-							authid,
-							authpwd),_sdp(sdp), _sem(sem){ sendcommand(rtsp_option);}
-	private:
-		virtual void response_option(int code, char* str)
-		{
-
-		   if(code == 0)
-			{
-				/*get sdp*/
-				sendcommand(rtsp_describe);
-			}
-
-			delete [] str;
-		}
-		virtual void response_describe(int code, char* str)
-		{
-			/*stop*/
-			*_sdp = std::string(str);
-			SEMA_unlock(_sem);
-		}
-	};
-
-	std::string sdp;
-	semaphore sem;
-	SEMA_open(&sem, 0, 1);
-
-
-	live5scheduler<rtsp_sdp_client> *scheduler = new live5scheduler<rtsp_sdp_client>();
-	scheduler->start(true,
-			live5rtspclient::report(),
-			std::get<streaming_list::index::fullpath>(_target).c_str(),
-			&sdp,
-			&sem,
-			nullptr,
-			nullptr);
-	_dword res = SEMA_lock(&sem, 5000);
-	if(res == WQ_SIGNALED)
+	sdp = live5rtspclient::targetserver_alive(5000, std::get<streaming_list::index::fullpath>(_target), "","");
+	if(!sdp.empty())
 	{
 		Poco::JSON::Object::Ptr root = new Poco::JSON::Object();
 		root->set("name", std::get<streaming_list::index::name>(_target).c_str());
@@ -214,8 +165,6 @@ void information_requesthandler::handle_message_proxy(Poco::Net::HTTPServerReque
 		response.setStatusAndReason(Poco::Net::HTTPResponse::HTTP_NOT_ACCEPTABLE,
 				Poco::Net::HTTPResponse::HTTP_REASON_NOT_ACCEPTABLE);
 	}
-	delete scheduler;
-	SEMA_close(&sem);
 }
 void information_requesthandler::handle_message_uvc(Poco::Net::HTTPServerRequest& request, Poco::Net::HTTPServerResponse& response)
 {

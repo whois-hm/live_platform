@@ -14,11 +14,11 @@ class httpserver : public Poco::Util::ServerApplication
 	{
 		const std::list<streaming_list::stream_values> &oursource_list = _streamlist.get();
 
-		lm_liveserver_log(dlog::normal,"<lm liveserver open>\n");
+		lm_liveserver_log(dlog::normal,"<server open>\n");
 
 		if(oursource_list.size() <= 0)
 		{
-			lm_liveserver_log(dlog::warnning,"source can't find, close lm liveserver.\n");
+			lm_liveserver_log(dlog::warnning,"source can't find, close server.\n");
 			return -1;
 		}
 
@@ -28,11 +28,11 @@ class httpserver : public Poco::Util::ServerApplication
 					std::get<streaming_list::index::type>(it) == source_type_file ? "file" :
 							"proxy";
 
-			lm_liveserver_log(dlog::normal,"source found that <%s/%s/%s>\n", stype,
+			lm_liveserver_log(dlog::normal,"source found that %s/%s/%s\n", stype,
 					std::get<streaming_list::index::fullpath>(it).c_str(),
 					std::get<streaming_list::index::name>(it).c_str());
 		}
-		lm_liveserver_log(dlog::normal,"now start seravaer\n");
+		lm_liveserver_log(dlog::normal,"now start server\n");
 
 		Poco::Net::HTTPServer sv(new reqeusthandlerfactory(oursource_list));
 		sv.start();
@@ -43,12 +43,6 @@ class httpserver : public Poco::Util::ServerApplication
 	}
 };
 
-class temp
-{
-public :
-	temp(){}
-	~temp(){}
-};
 
 int main(int argc, char **argv)
 {
@@ -60,7 +54,7 @@ int main(int argc, char **argv)
 	lm_liveserver_log.console_writer_install();
 	lm_liveserver_log.level_install(dlog::normal);
 	lm_liveserver_log.outbuffer_increase(1024);
-	lm_liveserver_log.prefix_install("[lm_liveserver] ");
+	lm_liveserver_log.prefix_install("[live_http] ");
 
 
 	httpserver ourserver;
