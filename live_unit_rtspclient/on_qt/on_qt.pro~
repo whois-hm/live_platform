@@ -1,0 +1,99 @@
+######################################
+#  build reositofy 'live_platform's root directory
+#  copy this .pro your QT Project
+#  and write just 'PLATFORM_ROOT'
+######################################
+PLATFORM_ROOT=""
+ARCH=$$system(arch)
+
+QT       += core gui
+QT       +=network
+
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+TARGET = live_unit_rtspclient
+TEMPLATE = app
+
+QMAKE_CXXFLAGS += -std=c++11
+
+DEP_DIRECTORY=$$PLATFORM_ROOT"/"$$ARCH"_dep"
+
+! exists($$DEP_DIRECTORY) {
+    error("can't found arch dependency directory")
+}
+
+! exists($$PLATFORM_ROOT"/livemedia") {
+    error("can't found livemedia directory")
+}
+
+INCLUDEPATH += $$DEP_DIRECTORY/ffmpeg/inc
+INCLUDEPATH += $$DEP_DIRECTORY/live555/inc
+INCLUDEPATH += $$DEP_DIRECTORY/poco/include
+INCLUDEPATH += $$DEP_DIRECTORY/wq/inc
+INCLUDEPATH += $$DEP_DIRECTORY/openssl/include
+INCLUDEPATH += $$PLATFORM_ROOT"/livemedia"
+
+SOURCES += \
+    $$PLATFORM_ROOT/live_unit_rtspclient/on_qt/main.cpp \
+    $$PLATFORM_ROOT/live_unit_rtspclient/on_qt/mainwindow.cpp
+
+
+HEADERS  += \
+    $$PLATFORM_ROOT//live_unit_rtspclient/on_qt/custom_event.h \
+    $$PLATFORM_ROOT//live_unit_rtspclient/on_qt/headers.h \
+    $$PLATFORM_ROOT//live_unit_rtspclient/on_qt/http_req.h \
+    $$PLATFORM_ROOT//live_unit_rtspclient/on_qt/mainwindow.h \
+    $$PLATFORM_ROOT//live_unit_rtspclient/on_qt/navigator.h
+
+
+LIBS += -L$$DEP_DIRECTORY/wq/lib/
+LIBS += -L$$DEP_DIRECTORY/live555/lib/
+LIBS += -L$$DEP_DIRECTORY/ffmpeg/lib/
+LIBS += -L$$DEP_DIRECTORY/poco/lib/
+LIBS += -L$$DEP_DIRECTORY/openssl/lib/
+
+LIBS +=     -lwq \
+                    -lliveMedia \
+                    -lgroupsock \
+                    -lUsageEnvironment \
+                    -lBasicUsageEnvironment \
+                    -lavformat \
+                    -lavfilter \
+                    -lavcodec \
+                    -lavdevice \
+                    -lavutil \
+                    -lfdk-aac\
+                    -lmp3lame \
+                    -lopus \
+                    -lpostproc \
+                    -lswresample \
+                    -lswscale \
+                    -lx264 \
+                    -lvpx \
+                    -lx265\
+                    -lyasm \
+                    -lz \
+                    -lvorbis\
+                    -ltheora \
+                    -ldl \
+                    -ltheoraenc \
+                    -ltheoradec \
+                    -lvorbisenc \
+                    -lvdpau \
+                    -lm \
+                    -lX11 \
+                    -lva \
+                    -lva-x11 \
+                    -lnuma  \
+                    -lPocoJSON \
+                    -lPocoUtil \
+                    -lPocoFoundation \
+                    -lPocoData \
+                    -lPocoEncodings \
+                    -ldl \
+                    -lm \
+                    -lpthread \
+                    -lrt \
+                    -lcrypto \
+                    -lssl
+

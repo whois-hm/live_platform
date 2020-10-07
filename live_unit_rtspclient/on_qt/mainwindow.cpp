@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 class contentsitem : public QListWidgetItem
 {
 public:
@@ -192,7 +191,6 @@ void MainWindow::start_http()
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow) ,
     _monitorsize(320,240),/*vga*/
     _thumbnailsize(160, 120),/*qqvga*/
     _filter(new filter(*this)),
@@ -230,7 +228,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+
 }
 
 void MainWindow::item_doubleclick(QListWidgetItem*i)

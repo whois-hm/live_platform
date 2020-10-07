@@ -1,8 +1,6 @@
 #pragma once
 #include "headers.h"
-namespace Ui {
-class MainWindow;
-}
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT    
@@ -30,7 +28,6 @@ private:
            return QObject::eventFilter(obj, e);
        }
    };
-   Ui::MainWindow *ui;
    QSize _monitorsize;
    QSize _thumbnailsize;
    filter *_filter;
