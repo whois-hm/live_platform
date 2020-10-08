@@ -69,27 +69,25 @@ namespace server
 				attr.get<avattr::avattr_type_string>("type") == "uvc" ?   source_type_uvc :
 				attr.get<avattr::avattr_type_string>("type") == "file" ?  source_type_file :
 														 source_type_rtspclient;
-		const char *input = attr.get<avattr::avattr_type_string>("input").c_str();
-		const char *sessionname = attr.get<avattr::avattr_type_string>("sessionname").c_str();
 
 		if(t == source_type_uvc)
 		{
 			return live5livemediapp_server_session_parameters_in(t,
-					 input,
+					 attr.get<avattr::avattr_type_string>("input").c_str(),
 					 make_session_default_uvc(),
-					 sessionname);
+					 attr.get<avattr::avattr_type_string>("sessionname").c_str());
 		}
 		if(t == source_type_file)
 		{
 			return live5livemediapp_server_session_parameters_in(t,
-					 input,
+					 attr.get<avattr::avattr_type_string>("input").c_str(),
 					 make_session_mp4(),
-					 sessionname);
+					 attr.get<avattr::avattr_type_string>("sessionname").c_str());
 		}
 		return live5livemediapp_server_session_parameters_in(t,
-				 input,
+				 attr.get<avattr::avattr_type_string>("input").c_str(),
 				 make_session_rtspclient(),
-				 sessionname);
+				 attr.get<avattr::avattr_type_string>("sessionname").c_str());
 	}
 	static live5livemediapp_server_session_parameters_out get_server_out_parameter(const avattr &attr)
 	{

@@ -194,7 +194,7 @@ MainWindow::MainWindow(QWidget *parent) :
     _monitorsize(320,240),/*vga*/
     _thumbnailsize(160, 120),/*qqvga*/
     _filter(new filter(*this)),
-    _http(new http("192.168.2.60", 80, this)),
+    _http(new http("192.168.2.123", 80, this)),
     _listwidget(new QListWidget(this)),
     _loadingblock(new QLabel(this)),
     _navigator(new navigator(this))
