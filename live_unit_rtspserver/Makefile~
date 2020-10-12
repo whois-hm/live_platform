@@ -27,7 +27,7 @@ CXX_OBJS=		$(CXX_SRCS:.cpp=.o)
 live_unit_rtspserver : $(CXX_OBJS)
 	$(CXX) -o live_unit_rtspserver $(CXX_OBJS) $(LIB_DIR) $(LIBS)
 main.o : main.cpp
-	$(CXX) -std=c++11 -D$(BUILD_ARCH) -fpermissive -c -o main.o main.cpp $(INC)
+	$(CXX) -std=c++11 -fpermissive -c -o main.o main.cpp $(INC)
 clean :
 	rm -f *.o
 	rm live_unit_rtspserver

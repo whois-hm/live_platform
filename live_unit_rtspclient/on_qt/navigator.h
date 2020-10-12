@@ -208,7 +208,7 @@ public:
     void close_if_complete_playback()
     {
         if(!videothread_is_run() &&
-                !audio_is_run() )
+               !audio_is_run() )
         {
             close();
         }

@@ -4,6 +4,8 @@
 #include "requesthandler.hpp"
 
 
+
+
 /*----------------------------------------------------------------------------------------------------------------
  class httpserver
  *----------------------------------------------------------------------------------------------------------------*/
@@ -44,6 +46,8 @@ class httpserver : public Poco::Util::ServerApplication
 };
 
 
+
+
 int main(int argc, char **argv)
 {
 
@@ -52,9 +56,26 @@ int main(int argc, char **argv)
 
 	lm_liveserver_log.log_enable();
 	lm_liveserver_log.console_writer_install();
+#if defined(armv7l)
+	struct _armv7loutlog
+	{
+		void operator () (std::string &str)
+		{
+			std::string o = "echo -e \x1b[31m";
+			o += str;
+			o += " > /dev/tty0 &";
+
+			system(o.c_str());
+		}
+	};
+	lm_liveserver_log.userout_writer_install(_armv7loutlog());
+#endif
+
+
 	lm_liveserver_log.level_install(dlog::normal);
 	lm_liveserver_log.outbuffer_increase(1024);
 	lm_liveserver_log.prefix_install("[live_http] ");
+	lm_liveserver_log.color(dlog::CYAN);
 
 
 	httpserver ourserver;

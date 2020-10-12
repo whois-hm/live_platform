@@ -1,6 +1,8 @@
 #include "core.hpp"
 static live5scheduler<live5rtspserver> *_server = nullptr;
 static ui *_clientgui = nullptr;
+#define lm_liveserver_log livemedia_pp::ref()->log()
+
 namespace server
 {
 	struct make_session_default_uvc
@@ -43,7 +45,10 @@ namespace server
 				const unsigned char *streamdata,
 				unsigned streamdata_size)
 		{
-
+            lm_liveserver_log(dlog::normal,"sending media(%s/%s/%d) to client(%d)\n", av_type_string_map()(mediatype),
+                av_type_string_map()(codecid),
+				streamdata_size,
+				clientsessionid);
 		}
 	};
 	struct client_incoming
@@ -51,6 +56,7 @@ namespace server
 		void operator()(std::string clientip,
 				unsigned clientsessionid)
 		{
+			lm_liveserver_log(dlog::normal,"client %s %d connection...\n", clientip.c_str(), clientsessionid);
 
 		}
 	};
@@ -60,6 +66,7 @@ namespace server
 				unsigned clientsessionid)
 		{
 			_server->trigger(live5scheduler<live5rtspserver>::live5scheduler_trigger_id_close);
+					lm_liveserver_log(dlog::normal,"client %s %d has been exit\n", clientip.c_str(), clientsessionid);
 		}
 	};
 
@@ -117,7 +124,7 @@ namespace server
 				!attr.notfound("auth_id") &&
 				!attr.notfound("auth_pwd"))
 		{
-			printf("lmp start width sessionname = %s inputsource = %s port = %d auth_id = %s auth_pwd = %s\n", attr.get<avattr::avattr_type_string>("sessionname").c_str(),
+		lm_liveserver_log(dlog::normal,"start width sessionname = %s inputsource = %s port = %d auth_id = %s auth_pwd = %s\n", attr.get<avattr::avattr_type_string>("sessionname").c_str(),
 					attr.get<avattr::avattr_type_string>("input").c_str(),
 					attr.get<avattr::avattr_type_int>("port"),
 					attr.get<avattr::avattr_type_string>("auth_id").c_str(),
@@ -138,6 +145,30 @@ namespace client
 static avattr open_process(int argc, char *argv[])
 {
 	livemedia_pp::ref();
+
+	lm_liveserver_log.log_enable();
+
+	lm_liveserver_log.console_writer_install();
+#if defined(armv7l)
+    struct _armv7loutlog
+    {
+        void operator () (std::string &str)
+        {
+            std::string o = "echo -e \x1b[36m";
+            o += str;
+            o += " > /dev/tty0 &";
+
+            system(o.c_str());
+        }
+    };
+    lm_liveserver_log.userout_writer_install(_armv7loutlog());
+#endif
+
+	lm_liveserver_log.level_install(dlog::normal);
+	lm_liveserver_log.outbuffer_increase(1024);
+	lm_liveserver_log.prefix_install("[unit rtsp server] ");
+	lm_liveserver_log.color(dlog::RED);
+	
 
 	int opt;
 	avattr attr;
@@ -163,9 +194,12 @@ static void close_process()
 int main(int argc, char *argv[])
 /* our main */
 {
+	lm_liveserver_log(dlog::normal,"open\n");
+
 	avattr attr = open_process(argc, argv);
 	if(attr.get<avattr::avattr_type_string>("operation") == "server")
 	{
+		lm_liveserver_log(dlog::normal,"start\n");
 		server::start_process(attr);
 	}
 	if(attr.get<avattr::avattr_type_string>("operation") == "client")
@@ -173,7 +207,10 @@ int main(int argc, char *argv[])
 		client::start_process(attr);
 	}
 
+	lm_liveserver_log(dlog::normal,"end\n");
+
 	close_process();
+	
 	return 0;
 }
 
